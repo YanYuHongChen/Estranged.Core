@@ -28,18 +28,18 @@ public:
 	class UEstHealthComponent *HealthComponent;
 
 	/** The character's currently equipped weapon. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Pickup)
+	UPROPERTY(EditAnywhere, Replicated, BlueprintReadWrite, Category = Pickup)
 	TWeakObjectPtr<class AEstBaseWeapon> EquippedWeapon;
 
 	/** Equip the specified weapon. */
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = Munitions)
+	UFUNCTION(BlueprintCallable, NetMulticast, Reliable, WithValidation, Category = Munitions)
 	void EquipWeapon(AEstBaseWeapon* Weapon);
 
 	UPROPERTY(BlueprintAssignable, Category = Fighting)
 	FOnOnChangeWeaponDelegate OnChangeWeapon;
 
 	/** Throw down the equipped weapon */
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = Munitions)
+	UFUNCTION(BlueprintCallable, NetMulticast, Reliable, WithValidation, Category = Munitions)
 	void UnequipWeapon();
 
 	/** Does the player have a weapon */

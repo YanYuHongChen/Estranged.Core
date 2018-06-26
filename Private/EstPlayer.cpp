@@ -648,7 +648,7 @@ bool AEstPlayer::IsViewTarget()
 {
 	if (PlayerCameraManager == nullptr)
 	{
-		return false;
+		return IsLocallyControlled();
 	}
 
 	// If we are animating to a target, we might not be the target

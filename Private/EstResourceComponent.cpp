@@ -1,4 +1,5 @@
 #include "EstCore.h"
+#include "UnrealNetwork.h"
 #include "EstResourceComponent.h"
 
 UEstResourceComponent::UEstResourceComponent()
@@ -7,6 +8,8 @@ UEstResourceComponent::UEstResourceComponent()
 	PrimaryComponentTick.TickInterval = .1f;
 	MaxResource = 100.f;
 	Resource = 100.f;
+
+	SetIsReplicated(true);
 }
 
 void UEstResourceComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction * ThisTickFunction)
@@ -24,6 +27,13 @@ void UEstResourceComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	}
 
 	ChangeResource(ResourceChangePerSecond * DeltaTime, GetOwner());
+}
+
+void UEstResourceComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	DOREPLIFETIME(UEstResourceComponent, IsFrozen);
+	DOREPLIFETIME(UEstResourceComponent, Resource);
+	DOREPLIFETIME(UEstResourceComponent, MaxResource);
 }
 
 bool UEstResourceComponent::ChangeResource(float Amount, AActor* Instigator)

@@ -28,6 +28,8 @@ void UEstHealthComponent::EndPlay(const EEndPlayReason::Type Type)
 
 void UEstHealthComponent::TakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
 {
+	UE_LOG(LogEstReplication, Warning, TEXT("TakeAnyDamage"));
+
 	if (Super::ChangeResource(-Damage, DamageCauser) && IsDepleted())
 	{
 		OnDeath.Broadcast(Damage, DamageType, InstigatedBy, DamageCauser);

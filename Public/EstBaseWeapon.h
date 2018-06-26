@@ -30,6 +30,8 @@ public:
 	/** Register all components for this actor. */
 	virtual void PostRegisterAllComponents() override;
 
+	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const;
+
 	/** Respond to the native C++ use event. */
 	virtual bool OnUsed_Implementation(AEstBaseCharacter* User, class USceneComponent* UsedComponent) override;
 
@@ -74,29 +76,29 @@ public:
 	virtual bool IsHolstered() { return bIsHolstered; };
 
 	/** Internal func to call for primary attack */
-	UFUNCTION()
+	UFUNCTION(Server, Reliable, WithValidation)
 	virtual void PrimaryAttack();
 	/** The event to implement in blueprints */
 	UPROPERTY(BlueprintAssignable, Category = Fighting)
 	FOnPrimaryAttackDelegate OnPrimaryAttack;
 	/** Start the weapon's primary attack. */
-	UFUNCTION(BlueprintCallable, Category = Fighting)
+	UFUNCTION(BlueprintCallable, Server, Reliable, WithValidation, Category = Fighting)
 	virtual void PrimaryAttackStart();
 	/** End the weapon's primary attack. */
-	UFUNCTION(BlueprintCallable, Category = Fighting)
+	UFUNCTION(BlueprintCallable, Server, Reliable, WithValidation, Category = Fighting)
 	virtual void PrimaryAttackEnd();
 
 	/** Internal func to call for secondary attack */
-	UFUNCTION()
+	UFUNCTION(Server, Reliable, WithValidation)
 	virtual void SecondaryAttack();
 	/** The event to implement in blueprints */
 	UPROPERTY(BlueprintAssignable, Category = Fighting)
 	FOnSecondaryAttackDelegate OnSecondaryAttack;
 	/** Start the weapon's secondary attack. */
-	UFUNCTION(BlueprintCallable, Category = Fighting)
+	UFUNCTION(BlueprintCallable, Server, Reliable, WithValidation, Category = Fighting)
 	virtual void SecondaryAttackStart();
 	/** End the weapon's secondary attack. */
-	UFUNCTION(BlueprintCallable, Category = Fighting)
+	UFUNCTION(BlueprintCallable, Server, Reliable, WithValidation, Category = Fighting)
 	virtual void SecondaryAttackEnd();
 
 	/** Is the weapon currently engaged in an activity (reload, shoot etc) */
@@ -134,15 +136,15 @@ public:
 	float SecondaryAttackLength;
 
 	/** STATE - Should we continue to fire the primary ammunition */
-	UPROPERTY(BlueprintReadOnly, Category = Fighting)
+	UPROPERTY(BlueprintReadOnly, Replicated, Category = Fighting)
 	bool bIsPrimaryFirePressed;
 
 	/** STATE - Should we continue to fire the secondary ammunition */
-	UPROPERTY(BlueprintReadOnly, Category = Fighting)
+	UPROPERTY(BlueprintReadOnly, Replicated, Category = Fighting)
 	bool bIsSecondaryFirePressed;
 
 	/** STATE - Is the weapon in its holster */
-	UPROPERTY(BlueprintReadOnly, Category = Fighting)
+	UPROPERTY(BlueprintReadOnly, Replicated, Category = Fighting)
 	bool bIsHolstered;
 
 	/** STATE, INTERNAL - world time in seconds of the end of the last activity */

@@ -23,6 +23,8 @@ public:
 
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
 
+	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const;
+
 	UFUNCTION(BlueprintPure, Category = "Resource")
 	virtual bool IsDepleted() { return FMath::IsNearlyZero(Resource); }
 
@@ -60,13 +62,13 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Resource")
 	FDepletedDelegate OnDepleted;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, SaveGame, Category = "Resource")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, SaveGame, Replicated, Category = "Resource")
 	bool IsFrozen;
 	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, SaveGame, Category = "Resource")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, SaveGame, Replicated, Category = "Resource")
 	float Resource;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, SaveGame, Category = "Resource")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, SaveGame, Replicated, Category = "Resource")
 	float MaxResource;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, SaveGame, Category = "Resource")

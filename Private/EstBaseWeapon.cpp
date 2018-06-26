@@ -1,5 +1,6 @@
 #include "EstCore.h"
 #include "EstBaseCharacter.h"
+#include "UnrealNetwork.h"
 #include "EstBaseWeapon.h"
 
 AEstBaseWeapon::AEstBaseWeapon(const class FObjectInitializer& PCIP)
@@ -12,6 +13,8 @@ AEstBaseWeapon::AEstBaseWeapon(const class FObjectInitializer& PCIP)
 	WeaponMesh->SetCollisionProfileName("Item");
 	WeaponMesh->bCastInsetShadow = true;
 	SetRootComponent(WeaponMesh);
+
+	bReplicates = true;
 }
 
 void AEstBaseWeapon::OnPostRestore_Implementation()
@@ -34,6 +37,13 @@ void AEstBaseWeapon::OnPostRestore_Implementation()
 void AEstBaseWeapon::OnPreSave_Implementation()
 {
 	OwnerActorName = GetOwner() ? OwnerActorName = GetOwner()->GetFName() : NAME_None;
+}
+
+void AEstBaseWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	DOREPLIFETIME(AEstBaseWeapon, bIsPrimaryFirePressed);
+	DOREPLIFETIME(AEstBaseWeapon, bIsSecondaryFirePressed);
+	DOREPLIFETIME(AEstBaseWeapon, bIsHolstered);
 }
 
 void AEstBaseWeapon::PostRegisterAllComponents()
@@ -59,6 +69,7 @@ void AEstBaseWeapon::UpdateWeaponPhysicsState()
 
 bool AEstBaseWeapon::OnUsed_Implementation(AEstBaseCharacter* User, class USceneComponent* UsedComponent)
 {
+	SetOwner(User);
 	User->EquipWeapon(this);
 	return true;
 }
@@ -69,26 +80,51 @@ void AEstBaseWeapon::SetEngagedInActivity(float ActivityLength)
 	LastActivityFinishTime = GetWorld()->TimeSeconds + ActivityLength;
 }
 
-void AEstBaseWeapon::PrimaryAttackStart()
+void AEstBaseWeapon::PrimaryAttackStart_Implementation()
 {
+	UE_LOG(LogEstReplication, Warning, TEXT("PrimaryAttackStart_Implementation"));
+
 	Unholster();
 	bIsPrimaryFirePressed = true;
 }
 
-void AEstBaseWeapon::PrimaryAttackEnd()
+bool AEstBaseWeapon::PrimaryAttackStart_Validate()
 {
+	return true;
+}
+
+void AEstBaseWeapon::PrimaryAttackEnd_Implementation()
+{
+	UE_LOG(LogEstReplication, Warning, TEXT("PrimaryAttackEnd_Implementation"));
+
 	bIsPrimaryFirePressed = false;
 }
 
-void AEstBaseWeapon::SecondaryAttackStart()
+bool AEstBaseWeapon::PrimaryAttackEnd_Validate()
+{
+	return true;
+}
+
+
+void AEstBaseWeapon::SecondaryAttackStart_Implementation()
 {
 	Unholster();
 	bIsSecondaryFirePressed = true;
 }
 
-void AEstBaseWeapon::SecondaryAttackEnd()
+bool AEstBaseWeapon::SecondaryAttackStart_Validate()
+{
+	return true;
+}
+
+void AEstBaseWeapon::SecondaryAttackEnd_Implementation()
 {
 	bIsSecondaryFirePressed = false;
+}
+
+bool AEstBaseWeapon::SecondaryAttackEnd_Validate()
+{
+	return true;
 }
 
 void AEstBaseWeapon::Tick(float DeltaTime)
@@ -97,17 +133,19 @@ void AEstBaseWeapon::Tick(float DeltaTime)
 
 	if (bIsPrimaryFirePressed)
 	{
-		return PrimaryAttack();
+		return PrimaryAttack_Implementation();
 	}
 
 	if (bIsSecondaryFirePressed)
 	{
-		return SecondaryAttack();
+		return SecondaryAttack_Implementation();
 	}
 }
 
-void AEstBaseWeapon::PrimaryAttack()
+void AEstBaseWeapon::PrimaryAttack_Implementation()
 {
+	UE_LOG(LogTemp, Warning, TEXT("PrimaryAttack_Implementation"));
+
 	if (IsEngagedInActivity())
 	{
 		return;
@@ -122,8 +160,15 @@ void AEstBaseWeapon::PrimaryAttack()
 	OnPrimaryAttack.Broadcast();
 }
 
-void AEstBaseWeapon::SecondaryAttack()
+bool AEstBaseWeapon::PrimaryAttack_Validate()
 {
+	return true;
+}
+
+void AEstBaseWeapon::SecondaryAttack_Implementation()
+{
+	UE_LOG(LogTemp, Warning, TEXT("SecondaryAttack_Implementation"));
+
 	if (IsEngagedInActivity())
 	{
 		return;
@@ -136,6 +181,11 @@ void AEstBaseWeapon::SecondaryAttack()
 	}
 
 	OnSecondaryAttack.Broadcast();
+}
+
+bool AEstBaseWeapon::SecondaryAttack_Validate()
+{
+	return true;
 }
 
 void AEstBaseWeapon::Equip(AEstBaseCharacter* OwnerCharacter)

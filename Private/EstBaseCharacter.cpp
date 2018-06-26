@@ -4,14 +4,16 @@
 #include "EstCharacterMovementComponent.h"
 #include "EstCapabilityVolume.h"
 #include "EstHealthComponent.h"
+#include "UnrealNetwork.h"
 #include "EstFirearmWeapon.h"
 
 AEstBaseCharacter::AEstBaseCharacter(const class FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<UEstCharacterMovementComponent>(CharacterMovementComponentName))
 {
 	HealthComponent = ObjectInitializer.CreateDefaultSubobject<UEstHealthComponent>(this, TEXT("Health"));
-
 	EstCharacterMovement = Cast<UEstCharacterMovementComponent>(GetCharacterMovement());
+
+	bReplicates = true;
 }
 
 void AEstBaseCharacter::BeginPlay()
@@ -22,6 +24,18 @@ void AEstBaseCharacter::BeginPlay()
 	{
 		EquipWeapon_Implementation(EquippedWeapon.Get());
 	}
+}
+
+void AEstBaseCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AEstBaseCharacter, EquippedWeapon);
+}
+
+bool AEstBaseCharacter::EquipWeapon_Validate(AEstBaseWeapon* Weapon)
+{
+	return true;
 }
 
 void AEstBaseCharacter::EquipWeapon_Implementation(AEstBaseWeapon* Weapon)
@@ -89,6 +103,11 @@ void AEstBaseCharacter::UnequipWeapon_Implementation()
 	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	EquippedWeapon->Unequip();
 	EquippedWeapon.Reset();
+}
+
+bool AEstBaseCharacter::UnequipWeapon_Validate()
+{
+	return true;
 }
 
 bool AEstBaseCharacter::HasWeapon()

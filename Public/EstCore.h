@@ -20,6 +20,7 @@ private:
 
 DECLARE_LOG_CATEGORY_EXTERN(LogEstGeneral, Log, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogEstFootsteps, Log, All);
+DECLARE_LOG_CATEGORY_EXTERN(LogEstReplication, Log, All);
 
 #define EST_IN_VIEWPORT GEngine && GEngine->GameViewport && GEngine->GameViewport->bIsPlayInEditorViewport
 

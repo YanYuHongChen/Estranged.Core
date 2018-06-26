@@ -1,5 +1,6 @@
 #include "EstCore.h"
 #include "EstCharacterMovementComponent.h"
+#include "UnrealNetwork.h"
 #include "EstBaseCharacter.h"
 #include "EstImpactManifest.h"
 #include "EstImpactEffect.h"
@@ -23,6 +24,13 @@ UEstCharacterMovementComponent::UEstCharacterMovementComponent(const class FObje
 	FootstepIntensityCrouching = .5f;
 	FootstepIntensityLand = 1.f;
 	FootstepIntensityJump = 5.f;
+
+	SetIsReplicated(true);
+}
+
+void UEstCharacterMovementComponent::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty, class FDefaultAllocator> & OutLifetimeProps)const
+{
+	DOREPLIFETIME(UEstCharacterMovementComponent, bIsSprinting);
 }
 
 void UEstCharacterMovementComponent::OnPreSave_Implementation()
@@ -66,7 +74,12 @@ bool UEstCharacterMovementComponent::IsSprinting() const
 	return bIsSprinting && IsWalking();
 }
 
-void UEstCharacterMovementComponent::SetSprinting(bool IsSprinting)
+bool UEstCharacterMovementComponent::SetSprinting_Validate(bool IsSprinting)
+{
+	return true;
+}
+
+void UEstCharacterMovementComponent::SetSprinting_Implementation(bool IsSprinting)
 {
 	bIsSprinting = IsSprinting;
 }

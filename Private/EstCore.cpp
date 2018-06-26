@@ -26,3 +26,4 @@ void FEstCoreModule::ShutdownModule()
 
 DEFINE_LOG_CATEGORY(LogEstGeneral);
 DEFINE_LOG_CATEGORY(LogEstFootsteps);
+DEFINE_LOG_CATEGORY(LogEstReplication);

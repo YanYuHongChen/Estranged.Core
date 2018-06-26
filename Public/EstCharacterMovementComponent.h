@@ -18,6 +18,8 @@ public:
 	void OnPostSave_Implementation() override {};
 // End IEstSaveRestore
 
+	virtual void GetLifetimeReplicatedProps(class TArray<class FLifetimeProperty, class FDefaultAllocator> &)const;
+
 	virtual float GetMaxSpeed() const override;
 
 	/** Is the character sprinting */
@@ -40,7 +42,7 @@ public:
 	UPROPERTY(Category = "Character Movement", SaveGame, EditAnywhere, BlueprintReadWrite)
 	bool bCanSprint;
 
-	UPROPERTY()
+	UPROPERTY(Replicated)
 	bool bIsSprinting;
 
 	UPROPERTY(Category = "Footsteps", EditAnywhere, BlueprintReadWrite)
@@ -91,7 +93,7 @@ public:
 	UPROPERTY(Category = "Character Movement: Jumping / Falling", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
 	float JumpVelocityMultiplier;
 
-	UFUNCTION(BlueprintCallable, Category = "Pawn|Components|CharacterMovement")
+	UFUNCTION(BlueprintCallable, Server, Reliable, WithValidation, Category = "Pawn|Components|CharacterMovement")
 	virtual void SetSprinting(bool IsSprinting);
 
 	virtual bool ShouldFootstep() const;
